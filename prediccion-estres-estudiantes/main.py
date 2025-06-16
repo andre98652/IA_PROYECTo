@@ -52,8 +52,8 @@ joblib.dump(model, "modelo_estres.pkl")
 
 # Paso 8: Evaluar el modelo
 y_pred = model.predict(X_test)
-accuracy = accuracy_score(y_test, y_pred)
-print(f"\nAccuracy en prueba: {accuracy:.2f}")
+test_accuracy = accuracy_score(y_test, y_pred)
+print(f"\nAccuracy en prueba: {test_accuracy:.2f}")
 print("\nReporte de clasificación:")
 print(classification_report(y_test, y_pred))
 
@@ -82,33 +82,14 @@ plt.tight_layout()
 plt.savefig("importancia_variables.png")
 plt.show()
 
-# Paso 11: Gráficos de dispersión
-
-# 11.1 Dispersión: calidad de sueño vs estrés
+# Paso 11: Comparación de accuracy (bias/varianza visual)
 plt.figure()
-sns.scatterplot(data=df, x="sleep_quality", y="stress_level")
-plt.title("Dispersión: Calidad de sueño vs Nivel de estrés")
-plt.savefig("disper_sueno_estres.png")
-plt.show()
-
-# 11.2 Dispersión: predicho vs real
-plt.figure()
-sns.scatterplot(x=y_test, y=y_pred)
-plt.title("Dispersión: Predicción vs Valor real")
-plt.xlabel("Valor real")
-plt.ylabel("Valor predicho")
-plt.savefig("disper_real_vs_pred.png")
-plt.show()
-
-# 11.3 Dispersión: error vs real
-errores = y_test - y_pred
-plt.figure()
-sns.scatterplot(x=y_test, y=errores)
-plt.axhline(0, color='red', linestyle='--')
-plt.title("Dispersión: Error de predicción vs Valor real")
-plt.xlabel("Valor real")
-plt.ylabel("Error")
-plt.savefig("disper_error_vs_real.png")
+plt.bar(["Entrenamiento", "Prueba"], [train_accuracy, test_accuracy], color=["green", "blue"])
+plt.title("Comparación de precisión: entrenamiento vs prueba")
+plt.ylim(0, 1)
+plt.ylabel("Accuracy")
+plt.tight_layout()
+plt.savefig("comparacion_accuracy.png")
 plt.show()
 
 # Paso 12: Predicción con nueva entrada simulada
