@@ -1,11 +1,10 @@
-# main.py
-
 import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeClassifier
 from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
-import matplotlib.pyplot as plt
-import seaborn as sns
 import joblib
 
 # Paso 1: Cargar el dataset
@@ -43,13 +42,18 @@ X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_
 model = DecisionTreeClassifier()
 model.fit(X_train, y_train)
 
+# Evaluación de bias y varianza
+train_pred = model.predict(X_train)
+train_accuracy = accuracy_score(y_train, train_pred)
+print(f"\nAccuracy en entrenamiento: {train_accuracy:.2f}")
+
 # Paso 7: Guardar modelo entrenado
 joblib.dump(model, "modelo_estres.pkl")
 
 # Paso 8: Evaluar el modelo
 y_pred = model.predict(X_test)
 accuracy = accuracy_score(y_test, y_pred)
-print(f"\nAccuracy del modelo: {accuracy:.2f}")
+print(f"\nAccuracy en prueba: {accuracy:.2f}")
 print("\nReporte de clasificación:")
 print(classification_report(y_test, y_pred))
 
@@ -78,12 +82,41 @@ plt.tight_layout()
 plt.savefig("importancia_variables.png")
 plt.show()
 
-# Paso 11: Predicción con nueva entrada simulada
+# Paso 11: Gráficos de dispersión
+
+# 11.1 Dispersión: calidad de sueño vs estrés
+plt.figure()
+sns.scatterplot(data=df, x="sleep_quality", y="stress_level")
+plt.title("Dispersión: Calidad de sueño vs Nivel de estrés")
+plt.savefig("disper_sueno_estres.png")
+plt.show()
+
+# 11.2 Dispersión: predicho vs real
+plt.figure()
+sns.scatterplot(x=y_test, y=y_pred)
+plt.title("Dispersión: Predicción vs Valor real")
+plt.xlabel("Valor real")
+plt.ylabel("Valor predicho")
+plt.savefig("disper_real_vs_pred.png")
+plt.show()
+
+# 11.3 Dispersión: error vs real
+errores = y_test - y_pred
+plt.figure()
+sns.scatterplot(x=y_test, y=errores)
+plt.axhline(0, color='red', linestyle='--')
+plt.title("Dispersión: Error de predicción vs Valor real")
+plt.xlabel("Valor real")
+plt.ylabel("Error")
+plt.savefig("disper_error_vs_real.png")
+plt.show()
+
+# Paso 12: Predicción con nueva entrada simulada
 nueva_entrada = [[3, 2, 4, 3, 1]]
 prediccion = model.predict(nueva_entrada)
 print("\nPredicción para nueva entrada (simulada):", prediccion[0])
 
-# Paso 12: Predicción con valores ingresados por consola
+# Paso 13: Predicción con valores ingresados por consola
 print("\n--- PREDICCIÓN MANUAL ---")
 try:
     sueño = int(input("Calidad del sueño (1-5): "))
@@ -92,7 +125,8 @@ try:
     carga = int(input("Carga académica (1-5): "))
     extra = int(input("Actividades extracurriculares por semana: "))
 
-    entrada_manual = [[sueño, cabeza, rendimiento, carga, extra]]
+    entrada_manual = pd.DataFrame(np.array([[sueño, cabeza, rendimiento, carga, extra]]),
+                                   columns=X.columns)
     prediccion_manual = model.predict(entrada_manual)
     print(f"\nNivel de estrés predicho: {prediccion_manual[0]}")
 except:
